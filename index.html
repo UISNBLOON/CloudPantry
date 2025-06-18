@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>云盘系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#36CFC9',
+                        success: '#52C41A',
+                        warning: '#FAAD14',
+                        danger: '#FF4D4F',
+                        dark: '#1F2329',
+                        'dark-light': '#4E5969',
+                        'light-gray': '#C9CDD4',
+                        'extra-light': '#F2F3F5'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+            .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .transition-custom {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .backdrop-blur {
+                backdrop-filter: blur(8px);
+            }
+        }
+    </style>
+</head>
+<body class="font-inter bg-extra-light text-dark antialiased">
+    <!-- 全局状态管理 -->
+    <script>
+        // 全局状态
+        const appState = {
+            user: null,
+            isAdmin: false,
+            isInstalled: localStorage.getItem('isInstalled') === 'true',
+            currentView: localStorage.getItem('isInstalled') === 'true' ? 'login' : 'install',
+            files: [],
+            folders: [],
+            currentPath: [],
+            selectedItems: [],
+            isLoading: false,
+            notifications: []
+        };
+        
+        // 模拟数据
+        const mockData = {
+            users: [
+                { id: 1, username: 'admin', password: 'admin123', email: 'admin@example.com', role: 'admin', storageUsed: 2147483648, storageLimit: 10737418240 },
+                { id: 2, username: 'user', password: 'user123', email: 'user@example.com', role: 'user', storageUsed: 536870912, storageLimit: 10737418240 }
+            ],
+            files: [
+                { id: 1, name: 'document.docx', type: 'document', size: 245678, path: [], createdAt: '2023-05-15', updatedAt: '2023-05-15' },
+                { id: 2, name: 'presentation.pptx', type: 'presentation', size: 4567890, path: [], createdAt: '2023-05-14', updatedAt: '2023-05-14' },
+                { id: 3, name: 'image.jpg', type: 'image', size: 1234567, path: [], createdAt: '2023-05-13', updatedAt: '2023-05-13' },
+                { id: 4, name: 'video.mp4', type: 'video', size: 87654321, path: [], createdAt: '2023-05-12', updatedAt: '2023-05-12' },
+                { id: 5, name: 'music.mp3', type: 'audio', size: 45678901, path: [], createdAt: '2023-05-11', updatedAt: '2023-05-11' }
+            ],
+            folders: [
+                { id: 1, name: '工作文档', path: [], createdAt: '2023-05-10', updatedAt: '2023-05-10' },
+                { id: 2, name: '个人照片', path: [], createdAt: '2023-05-09', updatedAt: '2023-05-09' },
+                { id: 3, name: '视频素材', path: [], createdAt: '2023-05-08', updatedAt: '2023-05-08' }
+            ]
+        };
+        
+        // 导入工具函数
+        import { loadData, saveData, formatSize, formatDate, getFileIcon, getFileColor, getReadableFileType, formatTimeAgo } from './utils.js';
+        
+        // 用户管理模块
+        import { userModule } from './user-module.js';
+        
+        // 文件管理模块
+        import { fileModule } from './file-module.js';
+        
+        // 渲染应用
+        function renderApp() {
+            const appContainer = document.getElementById('app');
+            appContainer.innerHTML = '';
+            
+            // 根据当前视图渲染不同的组件
+            switch (appState.currentView) {
+                case 'install':
+                    appContainer.appendChild(renderInstallView());
+                    break;
+                case 'login':
+                    appContainer.appendChild(renderLoginView());
+                    break;
+                case 'register':
+                    appContainer.appendChild(renderRegisterView());
+                    break;
+                case 'dashboard':
+                    appContainer.appendChild(renderDashboard());
+                    break;
+                case 'settings':
+                    appContainer.appendChild(renderSettings());
+                    break;
+                default:
+                    appContainer.appendChild(renderLoginView());
+            }
+        }
+        
+        // 页面加载完成后初始化应用
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检查是否已安装
+            if (localStorage.getItem('isInstalled') === 'true') {
+                // 检查是否已登录
+                const currentUser = loadData('currentUser');
+                if (currentUser) {
+                    appState.user = currentUser;
+                    appState.isAdmin = currentUser.role === 'admin';
+                    loadInitialData();
+                    userModule.navigateTo('dashboard');
+                } else {
+                    userModule.navigateTo('login');
+                }
+            } else {
+                userModule.navigateTo('install');
+            }
+        });
+    </script>
+
+    <div id="app"></div>
+</body>
+</html>    
