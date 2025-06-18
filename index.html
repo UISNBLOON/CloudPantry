@@ -61,6 +61,26 @@
     <!-- 全局状态管理 -->
     <script>
         // 全局状态
+        // WebSocket 连接
+        let socket = null;
+        if ('WebSocket' in window) {
+            socket = new WebSocket('ws://localhost:8080');
+            socket.onopen = function() {
+                console.log('WebSocket 连接已建立');
+            };
+            socket.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                if (data.type === 'file_update') {
+                    appState.files = data.files;
+                    renderApp();
+                }
+            };
+            socket.onclose = function() {
+                console.log('WebSocket 连接已关闭');
+            };
+        } else {
+            console.log('浏览器不支持 WebSocket');
+        }
         const appState = {
             user: null,
             isAdmin: false,
@@ -94,6 +114,8 @@
             ]
         };
         
+        // 导入云存储服务 API 工具
+        import { aliyunOSS, tencentCOS } from './cloud-storage-api.js';
         // 导入工具函数
         import { loadData, saveData, formatSize, formatDate, getFileIcon, getFileColor, getReadableFileType, formatTimeAgo } from './utils.js';
         
