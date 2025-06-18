@@ -145,7 +145,8 @@
                     userModule.navigateTo('login');
                 }
             } else {
-                userModule.navigateTo('install');
+                // 跳转到 install.php 进行安装
+                window.location.href = 'install.php';
             }
         });
     </script>
@@ -153,3 +154,65 @@
     <div id="app"></div>
 </body>
 </html>    
+<script>
+// 渲染安装界面
+function renderInstallView() {
+    const installContainer = document.createElement('div');
+    installContainer.className = 'max-w-md mx-auto mt-20 p-6 bg-white rounded-lg shadow-lg';
+
+    const title = document.createElement('h2');
+    title.className = 'text-2xl font-bold mb-4 text-center text-primary';
+    title.textContent = '云盘系统安装';
+
+    const form = document.createElement('form');
+    form.className = 'space-y-4';
+
+    const adminUsernameInput = document.createElement('input');
+    adminUsernameInput.type = 'text';
+    adminUsernameInput.className = 'w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary';
+    adminUsernameInput.placeholder = '管理员用户名';
+    adminUsernameInput.required = true;
+
+    const adminEmailInput = document.createElement('input');
+    adminEmailInput.type = 'email';
+    adminEmailInput.className = 'w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary';
+    adminEmailInput.placeholder = '管理员邮箱';
+    adminEmailInput.required = true;
+
+    const adminPasswordInput = document.createElement('input');
+    adminPasswordInput.type = 'password';
+    adminPasswordInput.className = 'w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary';
+    adminPasswordInput.placeholder = '管理员密码';
+    adminPasswordInput.required = true;
+
+    const submitButton = document.createElement('button');
+    submitButton.type = 'submit';
+    submitButton.className = 'w-full py-2 bg-primary text-white font-bold rounded-lg hover:bg-primary-dark transition-colors';
+    submitButton.textContent = '安装系统';
+
+    form.appendChild(adminUsernameInput);
+    form.appendChild(adminEmailInput);
+    form.appendChild(adminPasswordInput);
+    form.appendChild(submitButton);
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const username = adminUsernameInput.value;
+        const email = adminEmailInput.value;
+        const password = adminPasswordInput.value;
+
+        // 注册管理员账户
+        const result = userModule.register(username, email, password);
+        if (result.success) {
+            localStorage.setItem('isInstalled', 'true');
+            userModule.navigateTo('login');
+        } else {
+            alert(result.message);
+        }
+    });
+
+    installContainer.appendChild(title);
+    installContainer.appendChild(form);
+    return installContainer;
+}
+</script>
