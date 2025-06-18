@@ -10,26 +10,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $adminUsername = $_POST['admin_username'];
     $adminEmail = $_POST['admin_email'];
     $adminPassword = $_POST['admin_password'];
-
-    // 这里可以添加数据库连接和用户创建逻辑
-
-    // 创建配置文件
-    $configContent = "<?php
-    define('DB_HOST', 'localhost');
-    define('DB_USER', 'root');
-    define('DB_PASSWORD', '');
-    define('DB_NAME', 'cloud_pantry');
-    
-    define('ADMIN_USERNAME', '$adminUsername');
-    define('ADMIN_EMAIL', '$adminEmail');
-    define('ADMIN_PASSWORD', '$adminPassword');
-?>";
-
-    file_put_contents('config.php', $configContent);
-
-    // 重定向到登录页面
-    header('Location: index.html');
-    exit;
+    // 选择服务器目录作为存储目录
+    $storageDirectory = __DIR__ . '/storage';
+    if (!is_dir($storageDirectory)) {
+        mkdir($storageDirectory, 0777, true);
+    }
+    // 数据库连接和用户创建逻辑
+    $conn = new mysqli('localhost', 'root', '', 'cloud_pantry');
+    if ($conn->connect_error) {
+        die('数据库连接失败: ' . $conn->connect_error);
+    }
+    // 加密密码
+    $hashedPassword = password_hash($adminPassword, PASSWORD_DEFAULT);
+    // 创建默认管理员账号
+    $sql = "INSERT INTO users (username, email, password, role) VALUES ('$adminUsername', '$adminEmail', '$hashedPassword', 'admin')";
+    if ($conn->query($sql) === TRUE) {
+        // 创建配置文件
+        $configContent = "<?php
+        define('DB_HOST', 'localhost');
+        define('DB_USER', 'root');
+        define('DB_PASSWORD', '');
+        define('DB_NAME', 'cloud_pantry');
+        define('STORAGE_DIR', '$storageDirectory');
+        ?>";
+        file_put_contents('config.php', $configContent);
+        // 重定向到登录页面
+        header('Location: index.html');
+        exit;
+    } else {
+        echo '创建管理员账号失败: ' . $conn->error;
+    }
+    $conn->close();
 }
 ?>
 <!DOCTYPE html>
