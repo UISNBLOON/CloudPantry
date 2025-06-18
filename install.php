@@ -48,12 +48,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>云盘系统安装</title>
+    <title>CloudPantry 安装</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="font-inter bg-extra-light text-dark antialiased">
     <div class="max-w-md mx-auto mt-20 p-6 bg-white rounded-lg shadow-lg">
-        <h2 class="text-2xl font-bold mb-4 text-center text-primary">云盘系统安装</h2>
+        <h2 class="text-2xl font-bold mb-4 text-center text-primary">CloudPantry 安装</h2>
         <form method="post" class="space-y-4">
             <input type="text" name="admin_username" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary" placeholder="管理员用户名" required>
             <input type="email" name="admin_email" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-primary" placeholder="管理员邮箱" required>

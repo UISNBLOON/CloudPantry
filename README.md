@@ -1,7 +1,7 @@
 # cloudPantry项目文档
 
 ## 项目概述
-本项目是一个现代化的云盘系统，提供文件存储、管理和分享功能。系统采用前后端分离架构，前端使用HTML、Tailwind CSS和JavaScript构建，后端使用localStorage模拟数据存储。
+本项目是一个现代化的CloudPantry，提供文件存储、管理和分享功能。系统采用前后端分离架构，前端使用HTML、Tailwind CSS和JavaScript构建，后端使用localStorage模拟数据存储。
 
 ## 主要功能
 - 用户注册与登录
@@ -83,4 +83,6 @@ fetch('plugin-api.php?action=getPlugins')
 ## 贡献
 欢迎对项目提出建议和贡献代码，提交Pull Request前请确保代码通过测试。
 
+## 许可证
+本项目采用MIT许可证。
     
